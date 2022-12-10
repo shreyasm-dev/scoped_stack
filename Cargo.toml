@@ -6,12 +6,11 @@ edition = "2021"
 authors = ["shreyasm-dev"]
 description = "A scoped stack data structure"
 readme = "README.md"
-repository = "shreyasm-dev/scoped_stack"
+repository = "https://gitihub.com/shreyasm-dev/scoped_stack"
 license = "MIT"
 keywords = ["stack", "scoped", "data-structure"]
 categories = ["data-structure"]
 documentation = "https://docs.rs/scoped_stack"
-homepage = "https://gitihub.com/shreyasm-dev/scoped_stack"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
