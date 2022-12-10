@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://gitihub.com/shreyasm-dev/scoped_stack"
 license = "MIT"
 keywords = ["stack", "scoped", "data-structure"]
-categories = ["data-structure"]
+categories = ["data-structures"]
 documentation = "https://docs.rs/scoped_stack"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
