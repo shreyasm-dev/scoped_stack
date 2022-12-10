@@ -74,11 +74,28 @@ mod tests {
   }
 
   #[test]
+  fn test_push() {
+    let mut stack = ScopedStack::<String, String>::new();
+    stack.push_scope();
+    assert_eq!(stack.values.len(), 0);
+    assert_eq!(stack.child.is_some(), true);
+  }
+
+  #[test]
   fn test_push_scope() {
     let mut stack = ScopedStack::<String, String>::new();
     stack.push_scope();
     assert_eq!(stack.values.len(), 0);
     assert_eq!(stack.child.is_some(), true);
+  }
+
+  #[test]
+  fn test_pop() {
+    let mut stack = ScopedStack::<String, String>::new();
+    stack.push_scope();
+    stack.pop_scope();
+    assert_eq!(stack.values.len(), 0);
+    assert_eq!(stack.child, None);
   }
 
   #[test]
@@ -124,6 +141,22 @@ mod tests {
     stack.push_scope();
     stack.insert("foo".to_string(), "baz".to_string());
     assert_eq!(stack.get(&"foo".to_string()), Some(&"baz".to_string()));
+  }
+
+  #[test]
+  fn test_has() {
+    let mut stack = ScopedStack::<String, String>::new();
+    stack.insert("foo".to_string(), "bar".to_string());
+    assert_eq!(stack.has(&"foo".to_string()), true);
+  }
+
+  #[test]
+  fn test_has_scope() {
+    let mut stack = ScopedStack::<String, String>::new();
+    stack.insert("foo".to_string(), "bar".to_string());
+    stack.push_scope();
+    stack.insert("foo".to_string(), "baz".to_string());
+    assert_eq!(stack.has(&"foo".to_string()), true);
   }
 
   #[test]
