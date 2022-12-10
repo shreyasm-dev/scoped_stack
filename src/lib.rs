@@ -1,5 +1,11 @@
 use std::collections::HashMap;
 
+/// A scoped stack is a stack of hashmaps that allows you to push and pop scopes.
+/// When you push a scope, a new hashmap is created and pushed onto the stack.
+/// When you pop a scope, the top hashmap is popped off the stack.
+/// When you insert a value, it is inserted into the top hashmap.
+/// When you get a value, it is searched for in the top hashmap, and if it is not found, it is searched for in the next hashmap down the stack.
+/// When you remove a value, it is removed from the top hashmap, and if it is not found, it is removed from the next hashmap down the stack.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
   values: HashMap<K, V>,
@@ -7,6 +13,7 @@ pub struct ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
 }
 
 impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
+  /// Creates a new scoped stack.
   pub fn new() -> Self {
     ScopedStack {
       values: HashMap::new(),
@@ -14,17 +21,20 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     }
   }
 
+  /// Pushes a new scope onto the stack.
   pub fn push_scope(&mut self) {
     let child = Box::new(ScopedStack::new());
     self.child = Some(child);
   }
 
+  /// Pops the top scope off the stack.
   pub fn pop_scope(&mut self) {
     if let Some(child) = self.child.take() {
       *self = *child;
     }
   }
 
+  /// Inserts a value into the top scope.
   pub fn insert(&mut self, key: K, value: V) {
     if let Some(child) = self.child.as_mut() {
       child.insert(key, value);
@@ -33,6 +43,7 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     }
   }
 
+  /// Gets a value from the top scope, or any scope below it if it is not found in the top scope.
   pub fn get(&self, key: &K) -> Option<&V> {
     if let Some(child) = self.child.as_ref() {
       if child.has(key) {
@@ -45,6 +56,7 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     }
   }
 
+  /// Checks if a value exists in the top scope, or any scope below it.
   pub fn has(&self, key: &K) -> bool {
     if let Some(child) = self.child.as_ref() {
       child.has(key)
@@ -53,6 +65,7 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     }
   }
 
+  /// Removes a value from the top scope, or any scope below it if it is not found in the top scope.
   pub fn remove(&mut self, key: &K) -> Option<V> {
     if let Some(child) = self.child.as_mut() {
       child.remove(key)
