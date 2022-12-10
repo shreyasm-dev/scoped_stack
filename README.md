@@ -7,28 +7,30 @@ scoped_stack is a Rust library that provides a stack that can be scoped. Each `S
 ```rust
 use scoped_stack::ScopedStack;
 
-let mut stack = ScopedStack::<&str, i32>::new();
+fn main() {
+  let mut stack = ScopedStack::<&str, i32>::new();
 
-stack.insert("a", 1);
-stack.insert("b", 2);
-stack.insert("c", 3);
+  stack.insert("a", 1);
+  stack.insert("b", 2);
+  stack.insert("c", 3);
 
-assert_eq!(stack.get(&"a"), Some(&1));
-assert_eq!(stack.get(&"b"), Some(&2));
-assert_eq!(stack.get(&"c"), Some(&3));
+  assert_eq!(stack.get(&"a"), Some(&1));
+  assert_eq!(stack.get(&"b"), Some(&2));
+  assert_eq!(stack.get(&"c"), Some(&3));
 
-stack.push_scope();
+  stack.push_scope();
 
-stack.insert("a", 4);
-stack.insert("b", 5);
+  stack.insert("a", 4);
+  stack.insert("b", 5);
 
-assert_eq!(stack.get(&"a"), Some(&4));
-assert_eq!(stack.get(&"b"), Some(&5));
-assert_eq!(stack.get(&"c"), Some(&3));
+  assert_eq!(stack.get(&"a"), Some(&4));
+  assert_eq!(stack.get(&"b"), Some(&5));
+  assert_eq!(stack.get(&"c"), Some(&3));
 
-stack.pop_scope();
+  stack.pop_scope();
 
-assert_eq!(stack.get(&"a"), Some(&1));
-assert_eq!(stack.get(&"b"), Some(&2));
-assert_eq!(stack.get(&"c"), Some(&3));
+  assert_eq!(stack.get(&"a"), Some(&1));
+  assert_eq!(stack.get(&"b"), Some(&2));
+  assert_eq!(stack.get(&"c"), Some(&3));
+}
 ```
