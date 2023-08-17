@@ -52,11 +52,11 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     }
   }
 
-  /// Inserts a value at the top-most scope where it already exists (or the bottom scope if it does not exist)
-  pub fn insert_scope(&mut self, key: K, value: V) {
+  /// Inserts a value at the top-most scope where the key already exists (or the bottom scope if it does not exist)
+  pub fn insert_existing(&mut self, key: K, value: V) {
     if let Some(child) = self.child.as_mut() {
       if child.has(&key) {
-        child.insert_scope(key, value);
+        child.insert_existing(key, value);
       } else {
         self.values.insert(key, value);
       }
@@ -170,11 +170,11 @@ mod tests {
   }
 
   #[test]
-  fn test_insert_scope_scope() {
+  fn test_insert_existing_scope() {
     let mut stack = ScopedStack::<String, String>::new();
     stack.insert("foo".to_string(), "bar".to_string());
     stack.push_scope();
-    stack.insert_scope("foo".to_string(), "baz".to_string());
+    stack.insert_existing("foo".to_string(), "baz".to_string());
     stack.pop_scope();
     assert_eq!(stack.values.len(), 1);
     assert_eq!(stack.child.is_some(), false);
