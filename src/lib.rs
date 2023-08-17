@@ -29,9 +29,7 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
 
   /// Pops the top scope off the stack.
   pub fn pop_scope(&mut self) {
-    if let Some(child) = self.child.take() {
-      *self = *child;
-    }
+    self.child = None;
   }
 
   /// Inserts a value into the top scope.
