@@ -23,13 +23,20 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
 
   /// Pushes a new scope onto the stack.
   pub fn push_scope(&mut self) {
-    let child = Box::new(ScopedStack::new());
-    self.child = Some(child);
+    if let Some(child) = self.child.as_mut() {
+      child.push_scope();
+    } else {
+      self.child = Some(Box::new(ScopedStack::new()));
+    }
   }
 
   /// Pops the top scope off the stack.
   pub fn pop_scope(&mut self) {
-    self.child = None;
+    if let Some(child) = self.child.as_mut() {
+      child.pop_scope();
+    } else {
+      self.child = None;
+    }
   }
 
   /// Inserts a value into the top scope.
