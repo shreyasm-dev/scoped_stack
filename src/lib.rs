@@ -33,7 +33,11 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
   /// Pops the top scope off the stack.
   pub fn pop_scope(&mut self) {
     if let Some(child) = self.child.as_mut() {
-      child.pop_scope();
+      if child.child.is_some() {
+        child.pop_scope();
+      } else {
+        self.child = None;
+      }
     } else {
       self.child = None;
     }
@@ -50,15 +54,22 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
 
   /// Gets a value from the top scope, or any scope below it if it is not found in the top scope.
   pub fn get(&self, key: &K) -> Option<&V> {
-    if let Some(child) = self.child.as_ref() {
-      if child.has(key) {
-        child.get(key)
-      } else {
-        self.values.get(key)
+    let mut value = self.values.get(key);
+    let mut child = self.child.as_ref();
+
+    loop {
+      match child {
+        Some(c) => {
+          if let Some(v) = c.values.get(key) {
+            value = Some(v);
+          }
+          child = c.child.as_ref();
+        },
+        None => break,
       }
-    } else {
-      self.values.get(key)
     }
+
+    value
   }
 
   /// Checks if a value exists in the top scope, or any scope below it.
