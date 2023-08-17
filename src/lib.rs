@@ -52,6 +52,19 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     }
   }
 
+  /// Inserts a value at the top-most scope where it already exists (or the bottom scope if it does not exist)
+  pub fn insert_scope(&mut self, key: K, value: V) {
+    if let Some(child) = self.child.as_mut() {
+      if child.has(&key) {
+        child.insert_scope(key, value);
+      } else {
+        self.values.insert(key, value);
+      }
+    } else {
+      self.values.insert(key, value);
+    }
+  }
+
   /// Gets a value from the top scope, or any scope below it if it is not found in the top scope.
   pub fn get(&self, key: &K) -> Option<&V> {
     let mut value = self.values.get(key);
@@ -154,6 +167,18 @@ mod tests {
     assert_eq!(stack.child.is_some(), true);
     assert_eq!(stack.child.as_ref().unwrap().values.len(), 1);
     assert_eq!(stack.get(&"foo".to_string()), Some(&"bar".to_string()));
+  }
+
+  #[test]
+  fn test_insert_scope_scope() {
+    let mut stack = ScopedStack::<String, String>::new();
+    stack.insert("foo".to_string(), "bar".to_string());
+    stack.push_scope();
+    stack.insert_scope("foo".to_string(), "baz".to_string());
+    stack.pop_scope();
+    assert_eq!(stack.values.len(), 1);
+    assert_eq!(stack.child.is_some(), false);
+    assert_eq!(stack.get(&"foo".to_string()), Some(&"baz".to_string()));
   }
 
   #[test]
