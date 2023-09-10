@@ -7,12 +7,18 @@ use std::collections::HashMap;
 /// When you get a value, it is searched for in the top hashmap, and if it is not found, it is searched for in the next hashmap down the stack.
 /// When you remove a value, it is removed from the top hashmap, and if it is not found, it is removed from the next hashmap down the stack.
 #[derive(Debug, Clone, PartialEq)]
-pub struct ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
+pub struct ScopedStack<K, V>
+where
+  K: std::cmp::Eq + std::hash::Hash,
+{
   values: HashMap<K, V>,
   child: Option<Box<ScopedStack<K, V>>>,
 }
 
-impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
+impl<K, V> ScopedStack<K, V>
+where
+  K: std::cmp::Eq + std::hash::Hash,
+{
   /// Creates a new scoped stack.
   pub fn new() -> Self {
     ScopedStack {
@@ -75,7 +81,7 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
             value = Some(v);
           }
           child = c.child.as_ref();
-        },
+        }
         None => break,
       }
     }
@@ -99,6 +105,19 @@ impl<K, V> ScopedStack<K, V> where K: std::cmp::Eq + std::hash::Hash {
     } else {
       self.values.remove(key)
     }
+  }
+}
+
+impl<K, V> Into<HashMap<K, V>> for ScopedStack<K, V>
+where
+  K: std::cmp::Eq + std::hash::Hash,
+{
+  fn into(self) -> HashMap<K, V> {
+    let mut values = self.values;
+    if let Some(child) = self.child {
+      values.extend::<HashMap<K, V>>((*child).into());
+    }
+    values
   }
 }
 
@@ -228,5 +247,16 @@ mod tests {
     assert_eq!(stack.remove(&"foo".to_string()), Some("baz".to_string()));
     assert_eq!(stack.values.len(), 1);
     assert_eq!(stack.get(&"foo".to_string()), Some(&"bar".to_string()));
+  }
+
+  #[test]
+  fn test_into() {
+    let mut stack = ScopedStack::<String, String>::new();
+    stack.insert("foo".to_string(), "bar".to_string());
+    stack.push_scope();
+    stack.insert("foo".to_string(), "baz".to_string());
+    let map: HashMap<String, String> = stack.into();
+    assert_eq!(map.len(), 1);
+    assert_eq!(map.get(&"foo".to_string()), Some(&"baz".to_string()));
   }
 }
