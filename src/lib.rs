@@ -91,11 +91,7 @@ where
 
   /// Checks if a value exists in the top scope, or any scope below it.
   pub fn has(&self, key: &K) -> bool {
-    if let Some(child) = self.child.as_ref() {
-      child.has(key)
-    } else {
-      self.values.contains_key(key)
-    }
+    self.get(key).is_some()
   }
 
   /// Removes a value from the top scope, or any scope below it if it is not found in the top scope.
